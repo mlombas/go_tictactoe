@@ -18,11 +18,20 @@ func GetInt() int {
       result, err := strconv.ParseInt(input, 0, 64)
 
       if err != nil {
-         UserMistake("input was not an int")
+         ReportUserMistake("input was not an int")
       } else {
          return int(result)
       }
    }
+}
+
+func GetIntBounded(min, max int) value int {
+   for !util.IsInBound(value, min, max) {
+      ReportUserMistake("value out of bounds")
+      value = GetInt()
+   }
+
+   return
 }
 
 func AskInt(message string) int {
@@ -32,14 +41,7 @@ func AskInt(message string) int {
 
 func AskIntBounded(message string, min, max int) int {
    AskUser(message)
-
-   value := GetInt()
-   for !util.IsInBound(value, min, max) {
-      UserMistake("value out of bounds")
-      value = GetInt()
-   }
-
-   return value
+   return GetIntBounded(min, max)
 }
 
 func AskString(message string) string {
