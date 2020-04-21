@@ -25,7 +25,8 @@ func GetInt() int {
    }
 }
 
-func GetIntBounded(min, max int) value int {
+func GetIntBounded(min, max int) (value int) {
+   value = GetInt()
    for !util.IsInBound(value, min, max) {
       ReportUserMistake("value out of bounds")
       value = GetInt()
