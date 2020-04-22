@@ -3,7 +3,7 @@ package io
 import "fmt"
 
 func AskUser(what string) {
-   fmt.Printf("Please enter %s: ", what)
+   fmt.Printf("%s: ", what)
 }
 
 func ReportUserMistake(message string) {

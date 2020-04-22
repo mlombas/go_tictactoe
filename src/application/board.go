@@ -34,9 +34,19 @@ func NewBoard() Board {
    }
 }
 
-func (b *Board) Turn(x, y int) {
-   b.Set(x, y, b.turn)
-   b.switchTurn()
+func (b *Board) GetTurn() Tile {
+   return b.turn
+}
+
+func (b *Board) PlayTurn(x, y int) bool {
+   if b.get(x, y) == NOTHING {
+      b.set(x, y, b.turn)
+      b.switchTurn()
+
+      return true
+   } else {
+      return false
+   }
 }
 
 func (b *Board) switchTurn() {
@@ -57,7 +67,15 @@ func (b *Board) get(x, y int) Tile {
    return b.tiles[y * 3 + x]
 }
 
-func (b *Board) IsWon() Tile {
+func (b *Board) IsOccupied(x, y int) bool {
+   return b.get(x, y) != NOTHING
+}
+
+func (b *Board) Ended() bool {
+   return b.WhoWon() != NOTHING
+}
+
+func (b *Board) WhoWon() Tile {
    var res Tile
    for x := 0; x < 3; x++ {
       res = b.checkCol(x)
