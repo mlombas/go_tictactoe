@@ -1,8 +1,19 @@
-package application
+package board
 
 import (
    "strings"
 )
+
+type Position struct {
+   x int
+   y int
+}
+func NewPosition(x, y int) Position {
+   return Position { x, y }
+}
+func (pos Position) Extract() (int, int) {
+   return pos.x, pos.y
+}
 
 type Tile int
 const (
@@ -34,13 +45,30 @@ func NewBoard() Board {
    }
 }
 
+func (b *Board) Copy() Board {
+   var newTiles [9]Tile
+   for i, v := range b.tiles {
+      newTiles[i] = v
+   }
+
+   return Board {
+      tiles: newTiles,
+      turn: b.turn,
+   }
+}
+
 func (b *Board) GetTurn() Tile {
    return b.turn
 }
 
-func (b *Board) PlayTurn(x, y int) bool {
-   if b.get(x, y) == NOTHING {
-      b.set(x, y, b.turn)
+//This is here for future extensibility
+func (b *Board) GetDimension() int {
+   return 3
+}
+
+func (b *Board) PlayTurn(pos Position) bool {
+   if b.get(pos) == NOTHING {
+      b.set(pos, b.turn)
       b.switchTurn()
 
       return true
@@ -57,53 +85,64 @@ func (b *Board) switchTurn() {
    }
 }
 
-func (b *Board) set(x, y int, t Tile) {
+func (b *Board) set(pos Position, t Tile) {
    if isValidTile(t) {
+      x, y := pos.Extract()
       b.tiles[y * 3 + x] = t
    }
 }
 
-func (b *Board) get(x, y int) Tile {
+func (b *Board) get(pos Position) Tile {
+   x, y := pos.Extract()
    return b.tiles[y * 3 + x]
 }
 
-func (b *Board) IsOccupied(x, y int) bool {
-   return b.get(x, y) != NOTHING
+func (b *Board) IsOccupied(pos Position) bool {
+   return b.get(pos) != NOTHING
 }
 
 func (b *Board) Ended() bool {
-   return b.WhoWon() != NOTHING
+   return b.GetNFreeTiles() == 0 || b.WhoWon() != NOTHING
 }
 
-func (b *Board) WhoWon() Tile {
-   var res Tile
+func (b *Board) GetNFreeTiles() (counter int) {
+   for _, v := range b.tiles {
+      if v == NOTHING {
+         counter++
+      }
+   }
+
+   return
+}
+
+func (b *Board) WhoWon() (res Tile) {
    for x := 0; x < 3; x++ {
       res = b.checkCol(x)
       if res != NOTHING {
-         return res
+         return
       }
    }
    for y := 0; y < 3; y++ {
       res = b.checkRow(y)
       if res != NOTHING {
-         return res
+         return
       }
    }
 
    if res = b.checkMainDiagonal(); res != NOTHING {
-      return res
+      return
    }
    if res = b.checkSecondDiagonal(); res != NOTHING {
-      return res
+      return
    }
 
-   return NOTHING
+   return
 }
 
 func (b *Board) checkCol(x int) Tile {
    s := make([]Tile, 3)
    for y := 0; y < 3; y++ {
-      s[y] = b.get(x, y)
+      s[y] = b.get(NewPosition(x, y))
    }
 
    return checkSlice(s)
@@ -112,7 +151,7 @@ func (b *Board) checkCol(x int) Tile {
 func (b *Board) checkRow(y int) Tile {
    s := make([]Tile, 3)
    for x := 0; x < 3; x++ {
-      s[x] = b.get(x, y)
+      s[x] = b.get(NewPosition(x, y))
    }
 
    return checkSlice(s)
@@ -121,7 +160,7 @@ func (b *Board) checkRow(y int) Tile {
 func (b *Board) checkMainDiagonal() Tile {
    s := make([]Tile, 3)
    for i := 0; i < 3; i++ {
-      s[i] = b.get(i, i)
+      s[i] = b.get(NewPosition(i, i))
    }
 
    return checkSlice(s)
@@ -130,7 +169,7 @@ func (b *Board) checkMainDiagonal() Tile {
 func (b *Board) checkSecondDiagonal() Tile {
    s := make([]Tile, 3)
    for i := 0; i < 3; i++ {
-      s[i] = b.get(i, 3 - 1 - i)
+      s[i] = b.get(NewPosition(i, 3 - 1 - i))
    }
 
    return checkSlice(s)
@@ -154,7 +193,7 @@ func (b *Board) String() string {
    for y := 0; y < 3; y++ {
       line := make([]string, 3)
       for x := 0; x < 3; x++ {
-         line[x] = b.get(x, y).String()
+         line[x] = b.get(NewPosition(x, y)).String()
       }
       lines[y] = strings.Join(line, "|")
    }

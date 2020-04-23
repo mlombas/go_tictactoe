@@ -22,7 +22,7 @@ func GetInt() int {
       result, err := strconv.ParseInt(input, 0, 64)
 
       if err != nil {
-         ReportUserMistake("input was not an int")
+         AskUserToTryAgain("input was not an int")
       } else {
          return int(result)
       }
@@ -32,7 +32,7 @@ func GetInt() int {
 func GetIntBounded(min, max int) (value int) {
    value = GetInt()
    for !util.IsInBound(value, min, max) {
-      ReportUserMistake("value out of bounds")
+      AskUserToTryAgain("value out of bounds")
       value = GetInt()
    }
 
@@ -44,7 +44,7 @@ func GetIntPair() (int, int) {
       s := GetString()
       a, b, err := extractPair(s)
       if err != nil {
-         ReportUserMistake("entered bad pair")
+         AskUserToTryAgain("entered bad pair")
       } else {
          return a, b
       }
@@ -68,7 +68,7 @@ func extractPair(s string) (int, int, error) {
 func GetIntPairBounded(aMin, aMax, bMin, bMax int) (int, int) {
    a, b := GetIntPair()
    for !(util.IsInBound(a, aMin, aMax) && util.IsInBound(b, bMin, bMax)) {
-      ReportUserMistake("values entered out of bounds")
+      AskUserToTryAgain("values entered out of bounds")
       a, b = GetIntPair()
    }
 
@@ -78,7 +78,7 @@ func GetIntPairBounded(aMin, aMax, bMin, bMax int) (int, int) {
 func GetOfOptions(opts ...byte) byte {
    v := GetString()[0]
    for !util.ContainsByte(opts, v) {
-      ReportUserMistake("value not in options")
+      AskUserToTryAgain("value not in options")
       v = GetString()[0]
    }
 

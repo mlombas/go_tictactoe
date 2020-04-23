@@ -1,7 +1,7 @@
 package player
 
-import ".."
+import "../board"
 
 type Player interface {
-   GetMove(application.Board) (int, int)
+   GetMove(board.Board) board.Position
 }
